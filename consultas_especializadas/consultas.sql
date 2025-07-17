@@ -29,23 +29,12 @@ ORDER BY
 
 -- 2.Como administrador, deseo obtener el top 5 de clientes que más productos han calificado en los últimos 6 meses.
 
-SELECT 
-    c.id AS cliente_id,
-    c.name AS nombre_cliente,
-    c.email AS correo_electronico,
-    COUNT(qp.product_id) AS total_calificaciones,
-    AVG(qp.rating) AS promedio_calificacion
-FROM 
-    customers c
-JOIN 
-    quality_products qp ON c.id = qp.customer_id
-WHERE 
-    qp.daterating >= DATE_SUB(CURRENT_DATE(), INTERVAL 6 MONTH)
-GROUP BY 
-    c.id, c.name, c.email
-ORDER BY 
-    total_calificaciones DESC
-LIMIT 5;
+SELECT  c.id AS cliente_id, c.name AS nombre_cliente, c.email AS correo_electronico, COUNT(qp.product_id) AS total_calificaciones,AVG(qp.rating) AS promedio_calificacion
+FROM customers c
+JOIN quality_products qp ON c.id = qp.customer_id
+WHERE  qp.daterating >= DATE_SUB(CURRENT_DATE(), INTERVAL 6 MONTH)
+GROUP BY c.id, c.name, c.email
+ORDER BY total_calificaciones DESC LIMIT 5;
 
 
 -- 3. Como gerente de ventas, quiero ver la distribución de productos por categoría y unidad de medida
@@ -86,3 +75,42 @@ from citiesormunicipalities ci
 JOIN companies c ON ci.code = c.city_id
 JOIN categories cat ON cat.id = c.category_id
 ORDER BY c.name DESC;
+
+
+--8. Como especialista en marketing, deseo obtener los 10 productos más calificados en cada ciudad.
+
+SELECT ciudad.name AS ciudad, producto.name AS producto, ROUND(AVG(calificacion.rating), 2) AS calificacion_promedio
+FROM citiesormunicipalities ciudad
+JOIN companies empresa ON ciudad.code = empresa.city_id
+JOIN quality_products calificacion ON empresa.id = calificacion.company_id
+JOIN products producto ON calificacion.product_id = producto.id
+GROUP BY 
+    ciudad.name, producto.name
+ORDER BY ciudad.name,  calificacion_promedio DESC LIMIT 10;
+
+--9. Como técnico, quiero identificar productos sin unidad de medida asignada.
+
+SELECT p.id AS product_id,p.name AS product_name,p.detail AS product_description
+FROM 
+products p
+LEFT JOIN 
+companyproducts cp ON p.id = cp.product_id
+WHERE 
+cp.unitmeasure_id IS NULL
+ORDER BY p.name;
+
+10-- Como gestor de beneficios, deseo ver los planes de membresía sin beneficios registrados.
+SELECT  m.id AS membership_id, m.name AS membership_name, m.description AS membership_description
+FROM memberships m
+LEFT JOIN membershipbenefits mb ON m.id = mb.membership_id
+WHERE  mb.membership_id IS NULL
+ORDER BY m.name;
+
+
+
+
+
+
+
+
+
