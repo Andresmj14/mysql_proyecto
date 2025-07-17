@@ -199,9 +199,26 @@ JOIN categories cat ON p.category_id = cat.id
 GROUP BY ti.description, cat.description
 ORDER BY tipo_empresa, productos_unicos DESC;
 
+19. Ver total de clientes sin correo electrónico registrado
+"Como operador, quiere saber cuántos clientes no han registrado su correo."
 
+🔍 Explicación: Filtra customers WHERE email IS NULL y hace un COUNT(*). Esto ayuda a mejorar la base de datos para campañas.
 
+SELECT COUNT(*) AS total_clientes_sin_email
+FROM customers
+WHERE email IS NULL;
 
+20. Empresa con más productos calificados
+"Como especialista, desea obtener la empresa con el mayor número de productos calificados."
+
+🔍 Explicación: Hace un JOIN entre companies, companyproducts, y rates, agrupa por empresa y usa COUNT(DISTINCT product_id), ordenando en orden descendente y tomando solo el primero.
+
+SELECT c.name AS nombre_empresa, COUNT(DISTINCT qp.product_id) AS total_productos_calificados
+FROM companies AS c
+JOIN quality_products AS qp ON c.id = qp.company_id
+GROUP BY c.name
+ORDER BY total_productos_calificados DESC
+LIMIT 1;
 
 
 
